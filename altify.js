@@ -48,11 +48,58 @@ function createFunc(i) {
   return function(data) {
     if(data.status_code === "OK" && data.results[0].status_code === "OK") {
       var results = data.results[0].result.tag.classes;
-      var newAlt = "Clarify predicts " + results[0] + ", " + results[1] + ", and " + results[2];
-      altlessImgs[i].alt = newAlt;
-      console.log("Added: " + newAlt);
+      var taggedWords = new POSTagger().tag(results);
+
+      var adjectives = [];
+      var nouns = [];
+      var numAdjectives = 2;
+      var numNouns = 1;
+      var adjectivesFound = 0;
+      var nounsFound = 0;
+
+      for (i in taggedWords) {
+        var taggedWord = taggedWords[i];
+        var word = taggedWord[0];
+        var tag = taggedWord[1];
+
+        if(adjectivesFound != numAdjectives && tag.indexOf("JJ") != -1) {
+          adjectives.push(word);
+          ++adjectivesFound;
+        }
+        else if(nounsFound != numNouns && tag.indexOf("NN") != -1) {
+          nouns.push(word);
+          ++nounsFound;
+        }
+        if(nounsFound == numNouns && adjectivesFound == numAdjectives)
+          break;
+      }
+
+      // no adjective order, so it can sound funky
+      var phrase = "";
+      for(var i = 0; i < adjectivesFound; ++i) {
+        phrase += adjectives[i] + " ";
+      }
+
+      if(nounsFound >= 1) {
+        phrase += nouns[0];
+        for(var i = 1; i < nounsFound; ++i) {
+            phrase += " and " + nouns[i];
+        }
+      }
+
+      if(isVowel(phrase[0])) {
+          phrase = "An " + phrase;
+      } else {
+        phrase = "A " + phrase;
+      }
+      altlessImgs[i].alt = phrase;
+      console.log("Added: " + phrase);
     }
   }
+}
+
+function isVowel(c) {
+    return ['a', 'e', 'i', 'o', 'u'].indexOf(c.toLowerCase()) !== -1
 }
 
 var imgs = document.getElementsByTagName("img");

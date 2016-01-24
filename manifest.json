@@ -7,7 +7,7 @@
   "content_scripts": [
       {
         "matches": ["http://*/*", "https://*/*"],
-        "js": ["jquery-2.2.0.min.js", "altify.js"]
+        "js": ["jquery-2.2.0.min.js", "lexer.js", "lexicon.js_", "POSTagger.js", "altify.js"]
       }
   ],
   "author": "Collin Irwin"
